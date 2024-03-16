@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './styles.css'
+
 const App = () => {
   const [catFact, setCatFact] = useState('');
   const [name, setName] = useState('');
   const [age, setAge] = useState<number | null>(null);
   const [isFetching, setIsFetching] = useState(false);
+  const [isValidName, setIsValidName] = useState(true); // Добавляем состояние для проверки валидности имени
 
   const fetchCatFact = async () => {
     try {
@@ -45,8 +47,13 @@ const App = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsFetching(true);
-    fetchAge();
+    if (/^[A-Za-z]+$/.test(name)) { // Проверяем, состоит ли имя только из букв
+      setIsValidName(true);
+      setIsFetching(true);
+      fetchAge();
+    } else {
+      setIsValidName(false);
+    }
   };
 
   return (
@@ -57,8 +64,8 @@ const App = () => {
         </div>
         <div>
           <form onSubmit={handleSubmit}>
-          <input
-                className="input"
+            <input
+                className={`input ${!isValidName ? 'invalid' : ''}`} // Добавляем класс "invalid" в случае недопустимого имени
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -68,6 +75,7 @@ const App = () => {
               Get Age
             </button>
           </form>
+          {!isValidName && <p className="error">Please enter a valid name(only letters)</p>} {/* Отображаем ошибку, если имя недопустимо */}
           {age !== null && <p>Age: {age}</p>}
         </div>
       </div>
